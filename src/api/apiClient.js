@@ -1,92 +1,94 @@
 // src/api/apiClient.js
+const STORAGE_KEY = 'fitpro_storage_v1';
 
-// Dados de teste para visualização local (Mock Data)
-const MOCK_STUDENTS = [
-  { id: "1", name: "Rogério Gracini", status: "ativo", goal: "hipertrofia", email: "rogerio@exemplo.com.br" },
-  { id: "2", name: "Ana Silva", status: "ativo", goal: "emagrecimento", phone: "(19) 99999-8888" },
-  { id: "3", name: "Carlos Andrade", status: "em_avaliacao", goal: "condicionamento" }
-];
+// Função para ler do navegador
+const getDB = () => {
+  const data = localStorage.getItem(STORAGE_KEY);
+  return data ? JSON.parse(data) : { students: [], workouts: [], sessions: [] };
+};
 
-const MOCK_WORKOUTS = [
-  { 
-    id: "w1", 
-    name: "Treino A - Hipertrofia", 
-    student_id: "1", 
-    student_name: "Rogério Gracini",
-    type: "musculacao", 
-    difficulty: "avancado",
-    status: "ativo",
-    exercises: [
-      { name: "Supino Reto", sets: 4, reps: "10", rest: "60s" },
-      { name: "Desenvolvimento Militar", sets: 3, reps: "12", rest: "45s" }
-    ]
-  }
-];
+// Função para salvar no navegador
+const saveDB = (db) => localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
 
-const MOCK_SESSIONS = [
-  { 
-    id: "s1", 
-    student_id: "1", 
-    student_name: "Rogério Gracini", 
-    date: new Date().toISOString().split('T')[0], // Hoje
-    time: "08:30", 
-    duration: 60, 
-    status: "agendada",
-    workout_name: "Treino A - Hipertrofia"
-  }
-];
-
-// Simulador de cliente de API desacoplado da Base44
 export const api = {
   entities: {
-    Student: { 
-      list: async (...args) => MOCK_STUDENTS, 
-      create: async (data) => ({ id: Math.random().toString(), ...data }),
-      // Ajustado para receber um objeto com id e data, ou argumentos separados
+    Student: {
+      list: async () => getDB().students,
+      create: async (data) => {
+        const db = getDB();
+        const newItem = { ...data, id: Date.now().toString() };
+        db.students.push(newItem);
+        saveDB(db);
+        return newItem;
+      },
       update: async (arg1, arg2) => {
         const id = typeof arg1 === 'object' ? arg1.id : arg1;
         const data = typeof arg1 === 'object' ? arg1.data : arg2;
-        console.log(`Atualizando ${id}`, data);
+        const db = getDB();
+        db.students = db.students.map(s => s.id === id ? { ...s, ...data } : s);
+        saveDB(db);
         return data;
       },
-      delete: async (id) => id 
+      delete: async (id) => {
+        const db = getDB();
+        db.students = db.students.filter(s => s.id !== id);
+        saveDB(db);
+        return id;
+      }
     },
-    Workout: { 
-      list: async (...args) => MOCK_WORKOUTS, 
-      create: async (data) => ({ id: Math.random().toString(), ...data }),
+    Workout: {
+      list: async () => getDB().workouts,
+      create: async (data) => {
+        const db = getDB();
+        const newItem = { ...data, id: Date.now().toString() };
+        db.workouts.push(newItem);
+        saveDB(db);
+        return newItem;
+      },
       update: async (arg1, arg2) => {
         const id = typeof arg1 === 'object' ? arg1.id : arg1;
         const data = typeof arg1 === 'object' ? arg1.data : arg2;
+        const db = getDB();
+        db.workouts = db.workouts.map(w => w.id === id ? { ...w, ...data } : w);
+        saveDB(db);
         return data;
       },
-      delete: async (id) => id 
+      delete: async (id) => {
+        const db = getDB();
+        db.workouts = db.workouts.filter(w => w.id !== id);
+        saveDB(db);
+        return id;
+      }
     },
-    Session: { 
-      list: async (...args) => MOCK_SESSIONS, 
-      create: async (data) => ({ id: Math.random().toString(), ...data }),
+    Session: {
+      list: async () => getDB().sessions,
+      create: async (data) => {
+        const db = getDB();
+        const newItem = { ...data, id: Date.now().toString() };
+        db.sessions.push(newItem);
+        saveDB(db);
+        return newItem;
+      },
       update: async (arg1, arg2) => {
-        // Esta lógica trata tanto Session.update(id, data) quanto Session.update({id, data})
         const id = typeof arg1 === 'object' ? arg1.id : arg1;
         const data = typeof arg1 === 'object' ? arg1.data : arg2;
+        const db = getDB();
+        db.sessions = db.sessions.map(s => s.id === id ? { ...s, ...data } : s);
+        saveDB(db);
         return data;
       },
-      delete: async (id) => id 
-    },
-  },
-
-
-
-  auth: {
-    me: async () => ({ name: "Rogério", role: "admin" }), //
-    logout: () => { 
-      console.log("Logout local executado");
-      window.location.href = "/"; 
-    },
-    redirectToLogin: (url) => { 
-      console.log("Simulando redirecionamento de login para:", url); 
+      delete: async (id) => {
+        const db = getDB();
+        db.sessions = db.sessions.filter(s => s.id !== id);
+        saveDB(db);
+        return id;
+      }
     }
+  },
+  auth: {
+    me: async () => ({ name: "Rogério", role: "admin" }),
+    logout: () => { localStorage.removeItem(STORAGE_KEY); window.location.href = "/"; }
   }
 };
 
-// Mantemos o export 'base44' para compatibilidade com os arquivos existentes
 export const base44 = api;

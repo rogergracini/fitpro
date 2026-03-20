@@ -47,7 +47,8 @@ export default function Schedule() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Session.update(id, data),
+    //mutationFn: ({ id, data }) => base44.entities.Session.update(id, data),
+    mutationFn: (variables) => base44.entities.Session.update(variables.id, variables.data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["sessions"] }); setFormOpen(false); setEditing(null); },
   });
 

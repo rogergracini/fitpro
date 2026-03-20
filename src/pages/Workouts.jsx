@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/apiClient";
+import { api as base44 } from "@/api/apiClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dumbbell, Plus, Search, Trash2, Pencil, User, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";

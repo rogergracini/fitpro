@@ -80,10 +80,14 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    /* Remova o outline-ring/50 se não estiver usando Tailwind v4, 
+       ou use a sintaxe de variável CSS pura para garantir compatibilidade */
+    border-color: hsl(var(--border));
   }
 
   body {
-    @apply bg-background text-foreground font-inter;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-inter);
   }
 }

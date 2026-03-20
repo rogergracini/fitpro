@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,25 +23,46 @@ const difficulties = [
 ];
 
 export default function WorkoutForm({ workout, students = [], open, onClose, onSave }) {
-  const [form, setForm] = useState(workout || {
-    name: "", student_id: "", student_name: "",
-    type: "musculacao", difficulty: "intermediario",
-    exercises: [], status: "ativo"
-  });
+  // Estado inicial limpo para novos treinos
+  const initialState = {
+    name: "",
+    student_id: "",
+    student_name: "",
+    type: "musculacao",
+    difficulty: "intermediario",
+    exercises: [],
+    status: "ativo"
+  };
+
+  const [form, setForm] = useState(workout || initialState);
   const [saving, setSaving] = useState(false);
+
+  // Sincroniza o formulário quando o modal abre ou o treino selecionado muda
+  useEffect(() => {
+    if (open) {
+      setForm(workout || initialState);
+    }
+  }, [open, workout]);
 
   const handleChange = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleStudentChange = (studentId) => {
     const student = students.find((s) => s.id === studentId);
-    setForm((prev) => ({ ...prev, student_id: studentId, student_name: student?.name || "" }));
+    setForm((prev) => ({ 
+      ...prev, 
+      student_id: studentId, 
+      student_name: student?.name || "" 
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-    await onSave(form);
-    setSaving(false);
+    try {
+      await onSave(form);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -53,15 +74,24 @@ export default function WorkoutForm({ workout, students = [], open, onClose, onS
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div className="space-y-2">
             <Label>Nome do Treino *</Label>
-            <Input value={form.name} onChange={(e) => handleChange("name", e.target.value)} placeholder="Ex: Treino A - Peito e Tríceps" required />
+            <Input 
+              value={form.name} 
+              onChange={(e) => handleChange("name", e.target.value)} 
+              placeholder="Ex: Treino A - Peito e Tríceps" 
+              required 
+            />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>Aluno</Label>
               <Select value={form.student_id} onValueChange={handleStudentChange}>
-                <SelectTrigger><SelectValue placeholder="Selecionar aluno" /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecionar aluno" />
+                </SelectTrigger>
                 <SelectContent>
-                  {students.map((s) => (<SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>))}
+                  {students.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -70,7 +100,9 @@ export default function WorkoutForm({ workout, students = [], open, onClose, onS
               <Select value={form.type} onValueChange={(v) => handleChange("type", v)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {types.map((t) => (<SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>))}
+                  {types.map((t) => (
+                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -79,17 +111,28 @@ export default function WorkoutForm({ workout, students = [], open, onClose, onS
               <Select value={form.difficulty} onValueChange={(v) => handleChange("difficulty", v)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {difficulties.map((d) => (<SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>))}
+                  {difficulties.map((d) => (
+                    <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <ExerciseList exercises={form.exercises} onChange={(exs) => handleChange("exercises", exs)} />
+          {/* Componente que gerencia a lista dinâmica de exercícios */}
+          <ExerciseList 
+            exercises={form.exercises || []} 
+            onChange={(exs) => handleChange("exercises", exs)} 
+          />
 
           <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="outline" onClick={onClose}><X className="w-4 h-4 mr-2" />Cancelar</Button>
-            <Button type="submit" disabled={saving}><Save className="w-4 h-4 mr-2" />{saving ? "Salvando..." : "Salvar"}</Button>
+            <Button type="button" variant="outline" onClick={onClose}>
+              <X className="w-4 h-4 mr-2" />Cancelar
+            </Button>
+            <Button type="submit" disabled={saving}>
+              <Save className="w-4 h-4 mr-2" />
+              {saving ? "Salvando..." : "Salvar"}
+            </Button>
           </div>
         </form>
       </DialogContent>
