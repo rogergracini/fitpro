@@ -1,3 +1,5 @@
+// src/components/shared/StatCard.jsx
+
 import React from "react";
 import { Card } from "@/components/ui/card";
 

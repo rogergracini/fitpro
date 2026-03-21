@@ -1,8 +1,17 @@
+// src/pages/Landing.jsx
+
 import React, { useState } from "react";
 import { Dumbbell, Check, Star, Zap, Shield, ChevronRight, Instagram, Phone, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
+
+import case1Before from "@/assets/results/case-1-before.png";
+import case1After from "@/assets/results/case-1-after.png";
+import case2Before from "@/assets/results/case-2-before.png";
+import case2After from "@/assets/results/case-2-after.png";
+import case3Before from "@/assets/results/case-3-before.jpg";
+import case3After from "@/assets/results/case-3-after.jpg";
 
 const plans = [
   {
@@ -77,22 +86,22 @@ const transformations = [
     name: "Lucas Oliveira",
     period: "4 meses",
     result: "+8kg massa muscular",
-    before: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=500&fit=crop&q=80",
-    after: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=500&fit=crop&q=80",
+    before: case1Before,
+    after: case1After,
   },
   {
     name: "Marina Santos",
     period: "3 meses",
     result: "-12kg de gordura",
-    before: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=500&fit=crop&q=80",
-    after: "https://images.unsplash.com/photo-1609899537878-48e6cf60bbab?w=400&h=500&fit=crop&q=80",
+    before: case2Before,
+    after: case2After,
   },
   {
     name: "Rafael Costa",
     period: "60 dias",
     result: "Condicionamento total",
-    before: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=500&fit=crop&q=80",
-    after: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=400&h=500&fit=crop&q=80",
+    before: case3Before,
+    after: case3After,
   },
 ];
 
